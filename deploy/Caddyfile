@@ -1,0 +1,5 @@
+{$NULLRAUM_DOMAIN} {
+	encode zstd gzip
+	# No access logs: Caddy does not log requests unless configured to.
+	reverse_proxy nullraum:8080
+}

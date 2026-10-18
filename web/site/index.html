@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#07080a">
+  <title>Nullraum – Post-Quantum-Chat mit Raumcode</title>
+  <meta name="description" content="Nullraum ist ein Open-Source-Chat für geschlossene Räume. Ein Code öffnet den Raum, der Initiator bestätigt jedes Mitglied, und alles ist post-quantum Ende-zu-Ende verschlüsselt. Selbst hostbar per Docker.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+  <script src="site.js" defer></script>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="#top"><span class="brand-mark"></span>Nullraum</a>
+    <nav class="links">
+      <a href="#how">So funktioniert's</a>
+      <a href="#features">Funktionen</a>
+      <a href="#security">Sicherheit</a>
+      <a href="#install">Installation</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn ghost small" href="https://github.com/maliceatthepalace/nullraum" rel="noopener">GitHub</a>
+      <a class="btn primary small js-app" href="app/">App öffnen</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow"><i class="dot"></i>Open Source · Post-Quantum · Kein Konto</span>
+        <h1>Ein Code.<br>Ein Raum.<br><span class="grad">Niemand sonst.</span></h1>
+        <p class="lead">Nullraum ist ein Chat für geschlossene Räume. Du erstellst einen Raum und bekommst einen Code. Den gibst du weiter, wie du willst: auf Papier, persönlich oder per Messenger. Wer den Code hat, kann anklopfen. Hinein kommt nur, wen du bestätigst. Texte, Bilder, Videos und Sprachnachrichten sind dabei post-quantum Ende-zu-Ende verschlüsselt.</p>
+        <div class="hero-cta">
+          <a class="btn primary js-app" href="app/">Raum erstellen</a>
+          <a class="btn" href="#install">Selbst hosten <span class="arrow">→</span></a>
+        </div>
+        <ul class="algos">
+          <li>ML-KEM-768 + X25519</li>
+          <li>ML-DSA-65</li>
+          <li>XChaCha20-Poly1305</li>
+          <li>Argon2id</li>
+        </ul>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="paper">
+          <div class="paper-head">RAUMCODE</div>
+          <div class="paper-code" id="paper-code">7KQF-3MXZ-9TBC-HW2R<br>PVN8-04JD-YGSE-KA6Q</div>
+          <div class="paper-foot">nur kontrolliert weitergeben</div>
+        </div>
+        <div class="window">
+          <div class="win-bar"><span></span><span></span><span></span><b>Familie</b><em>PQ · Epoche 3</em></div>
+          <div class="win-body">
+            <div class="b them"><small>Mara</small>Hab den Zettel bekommen 📄</div>
+            <div class="b me">Perfekt. Ich hab dich gerade bestätigt ✓</div>
+            <div class="b them voice"><small>Mara</small><span class="wave"></span>0:07</div>
+            <div class="b me photo"></div>
+          </div>
+          <div class="win-wire">
+            <span>Relay sieht:</span>
+            <code id="cipher">a9f3…</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STRIP -->
+    <section class="strip">
+      <div><b>0</b><span>Konten, Telefonnummern oder E-Mails</span></div>
+      <div><b>0</b><span>Bytes Klartext auf dem Server</span></div>
+      <div><b>150 Bit</b><span>Zufall in jedem Raumcode</span></div>
+      <div><b>1</b><span>Binary für Linux, macOS und Windows, dazu ein Docker-Image</span></div>
+    </section>
+
+    <!-- HOW -->
+    <section id="how" class="section">
+      <div class="section-head">
+        <span class="kicker">So funktioniert's</span>
+        <h2>Vom Zettel zum verschlüsselten Raum<br>in vier Schritten.</h2>
+      </div>
+      <ol class="steps">
+        <li>
+          <span class="num">01</span>
+          <h3>Raum erstellen</h3>
+          <p>Dein Gerät erzeugt einen zufälligen Code mit 8 Blöcken zu je 4 Zeichen, einen zufälligen Raumschlüssel und deine post-quantum Schlüsselpaare. Auf Wunsch kommen ein Passwort, ein Zweitschlüssel oder drei Sicherheitsfragen dazu.</p>
+        </li>
+        <li>
+          <span class="num">02</span>
+          <h3>Code weitergeben</h3>
+          <p>Schreib den Code auf Papier, druck ihn aus oder schick ihn über einen Messenger. Du entscheidest, wer ihn bekommt. Verwechselbare Zeichen wie O/0 und I/1 sind ausgeschlossen, und eine Prüfsumme erkennt Tippfehler.</p>
+        </li>
+        <li>
+          <span class="num">03</span>
+          <h3>Anklopfen &amp; bestätigen</h3>
+          <p>Wer den Code eingibt, klopft an. Du als Initiator siehst Name und Sicherheitsnummer und klickst auf <em>Aufnehmen</em>. Erst dann bekommt die Person den Raumschlüssel, verschlüsselt mit ML-KEM-768 + X25519 nur für ihr Gerät.</p>
+        </li>
+        <li>
+          <span class="num">04</span>
+          <h3>Sicher chatten</h3>
+          <p>Jede Nachricht wird mit dem Raumschlüssel verschlüsselt und mit ML-DSA-65 signiert. Entfernst du jemanden, wird der Schlüssel sofort gewechselt. Die Person kann danach nichts mehr mitlesen.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section">
+      <div class="section-head">
+        <span class="kicker">Funktionen</span>
+        <h2>Alles, was ein privater Raum braucht.<br><span class="muted">Mehr nicht.</span></h2>
+      </div>
+      <div class="bento">
+        <article class="tile big">
+          <div class="tile-ic">⚛︎</div>
+          <h3>Post-Quantum von Anfang an</h3>
+          <p>Der Schlüsselaustausch nutzt den hybriden HPKE-KEM aus <b>ML-KEM-768</b> (FIPS 203) und <b>X25519</b>. Ein Angreifer müsste beide Verfahren brechen. Damit hilft auch „heute mitschneiden, später mit Quantencomputer entschlüsseln“ nicht. Signaturen nutzen <b>ML-DSA-65</b> (FIPS 204).</p>
+          <div class="layers">
+            <span>Nachricht</span><i>→</i><span>ML-DSA-65 Signatur</span><i>→</i><span>XChaCha20-Poly1305</span><i>→</i><span>Padding</span><i>→</i><span>Relay</span>
+          </div>
+        </article>
+        <article class="tile">
+          <div class="tile-ic">✓</div>
+          <h3>Initiator bestätigt jeden</h3>
+          <p>Der Code allein reicht nicht. Jede Beitrittsanfrage muss aktiv angenommen werden, und eine Sicherheitsnummer deckt Man-in-the-Middle-Angriffe auf.</p>
+        </article>
+        <article class="tile">
+          <div class="tile-ic">🔐</div>
+          <h3>Zweite Schutzschicht</h3>
+          <p>Optional sichern ein <b>Passwort</b>, ein separater <b>Zweitschlüssel</b> oder <b>drei Sicherheitsfragen</b> den Raum zusätzlich ab. Das Geheimnis wird mit Argon2id gehärtet und fließt in alle Schlüssel ein.</p>
+        </article>
+        <article class="tile">
+          <div class="tile-ic">🎙</div>
+          <h3>Bilder, Videos, Sprachnachrichten</h3>
+          <p>Bis 50 MB pro Datei. Jede Datei bekommt einen eigenen Schlüssel. Bei Fotos werden Metadaten wie der GPS-Standort vor dem Senden entfernt.</p>
+        </article>
+        <article class="tile">
+          <div class="tile-ic">⧉</div>
+          <h3>Redundant, aber nur im Raum lesbar</h3>
+          <p>Jedes Mitglied hält eine verschlüsselte Kopie des Verlaufs. Fehlt einem Gerät etwas, liefern die anderen es Peer-to-Peer nach. Lokal liegen nur Chiffretexte, und ohne Code ist nichts lesbar.</p>
+        </article>
+        <article class="tile">
+          <div class="tile-ic">↻</div>
+          <h3>Schlüsselwechsel &amp; Rauswurf</h3>
+          <p>Wer entfernt wird oder geht, bekommt den nächsten Schlüssel nicht mehr. Neue Mitglieder sehen ältere Nachrichten nur, wenn du das erlaubst.</p>
+        </article>
+        <article class="tile">
+          <div class="tile-ic">⌁</div>
+          <h3>Blindes Relay</h3>
+          <p>Der Server leitet nur Rauschen weiter. Er kennt weder Codes noch Namen, Raumnamen oder Schlüssel, speichert nichts auf der Festplatte und schreibt keine IP-Logs.</p>
+        </article>
+        <article class="tile">
+          <div class="tile-ic">⏻</div>
+          <h3>Panik-Knopf</h3>
+          <p>Ein Klick löscht alle Räume, Schlüssel und Medien vom Gerät. Der Initiator kann einen Raum außerdem für alle schließen. Dann löschen alle Geräte ihre Kopie.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section id="security" class="section">
+      <div class="section-head">
+        <span class="kicker">Sicherheit</span>
+        <h2>Was der Server sieht und was nicht.</h2>
+        <p class="sub">Nullraum ist auf ein nicht vertrauenswürdiges Relay ausgelegt. Selbst wenn der Server kompromittiert ist, bleiben Inhalte, Namen und Codes geheim.</p>
+      </div>
+
+      <div class="compare">
+        <div class="col sees">
+          <h3>Relay sieht</h3>
+          <ul>
+            <li>eine zufällig wirkende Raum-ID (Hash, aus dem Code abgeleitet)</li>
+            <li>wie viele Verbindungen in einem Raum sind</li>
+            <li>Zeitpunkt und gepolsterte Größe verschlüsselter Pakete</li>
+            <li>IP-Adressen der Verbindungen (nicht geloggt; nutze VPN/Tor, wenn das wichtig ist)</li>
+          </ul>
+        </div>
+        <div class="col hidden-col">
+          <h3>Relay sieht nie</h3>
+          <ul>
+            <li>den Raumcode, das Passwort, den Zweitschlüssel oder die Antworten</li>
+            <li>Nachrichten, Bilder, Videos, Sprachnachrichten</li>
+            <li>Namen der Mitglieder und des Raums</li>
+            <li>wer welche Nachricht geschrieben hat</li>
+            <li>irgendeinen Schlüssel</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-row"><span class="tag">Code</span><span class="op">Argon2id</span><span class="tag">Master</span><span class="op">HKDF</span><span class="tag">Raum-ID · Beitrittsschlüssel · Tresorschlüssel</span></div>
+        <div class="flow-row"><span class="tag">+ Passwort / Zweitschlüssel / 3 Antworten</span><span class="op">Argon2id + Salt</span><span class="tag">fließt in Beitritt und Tresor ein</span></div>
+        <div class="flow-row"><span class="tag">Raumschlüssel (256 Bit, zufällig)</span><span class="op">HPKE · ML-KEM-768 + X25519</span><span class="tag">nur an bestätigte Mitglieder</span></div>
+        <div class="flow-row"><span class="tag">Nachricht</span><span class="op">ML-DSA-65 · XChaCha20-Poly1305</span><span class="tag">signiert, verschlüsselt, gepolstert</span></div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="crypto">
+          <thead><tr><th>Zweck</th><th>Verfahren</th><th>Warum</th></tr></thead>
+          <tbody>
+            <tr><td>Schlüsselzustellung</td><td>HPKE (RFC 9180) mit ML-KEM-768 + X25519, HKDF-SHA256, ChaCha20-Poly1305</td><td>Hybrid: sicher, solange eines der beiden Verfahren hält</td></tr>
+            <tr><td>Absender-Authentizität</td><td>ML-DSA-65 (FIPS 204)</td><td>Quantensichere Signaturen, keine Fälschung durch andere Mitglieder</td></tr>
+            <tr><td>Inhalte &amp; Medien</td><td>XChaCha20-Poly1305, 256-Bit-Schlüssel, 192-Bit-Nonces</td><td>256-Bit-Symmetrie bleibt auch gegen Grover sicher</td></tr>
+            <tr><td>Code &amp; Passwörter</td><td>Argon2id (64 MiB, 3 Durchläufe)</td><td>Macht Raten teuer, auch mit GPUs</td></tr>
+            <tr><td>Längen verschleiern</td><td>Padding auf Zweierpotenzen bzw. 64-KiB-Blöcke</td><td>„ok“ und ein langer Absatz sehen gleich aus</td></tr>
+            <tr><td>Implementierung</td><td>Go-Standardbibliothek, im Browser als WebAssembly</td><td>Keine selbstgebaute Kryptografie in JavaScript</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="honest">
+        <h3>Ehrlich gesagt: Was Nullraum nicht kann</h3>
+        <ul>
+          <li><b>Kompromittierte Geräte.</b> Schadsoftware auf einem Gerät oder ein Screenshot liest mit. Keine Verschlüsselung der Welt hilft dagegen.</li>
+          <li><b>Vertrauen in den App-Code.</b> Öffnest du die App über einen fremden Server, könnte dessen Betreiber manipulierten Code ausliefern. Am sichersten ist es, den Server selbst zu betreiben oder <code>nullraum client</code> lokal zu starten. Dann kommt der Code von deinem eigenen Rechner.</li>
+          <li><b>Metadaten.</b> Wann wie viel gesendet wird, ist für das Relay sichtbar. IP-Adressen werden nicht geloggt, sind technisch aber vorhanden.</li>
+          <li><b>Forward Secrecy pro Nachricht.</b> Der Raumschlüssel wechselt bei jedem Rauswurf, bei jeder Aufnahme (wenn neue Mitglieder den Verlauf nicht sehen dürfen) und auf Knopfdruck, aber nicht bei jeder Nachricht.</li>
+          <li><b>Kein Audit.</b> Das Projekt ist neu und noch nicht unabhängig geprüft. Reviews sind willkommen.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- INSTALL -->
+    <section id="install" class="section">
+      <div class="section-head">
+        <span class="kicker">Installation</span>
+        <h2>In einer Minute startklar.</h2>
+        <p class="sub">Einer betreibt das Relay, zum Beispiel auf einem kleinen Server, NAS oder Raspberry Pi. Alle anderen öffnen nur die Adresse im Browser.</p>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="on" data-tab="docker" role="tab">Docker</button>
+        <button data-tab="linux" role="tab">Linux</button>
+        <button data-tab="mac" role="tab">macOS</button>
+        <button data-tab="win" role="tab">Windows</button>
+        <button data-tab="src" role="tab">Quellcode</button>
+      </div>
+
+      <div class="panes">
+        <div class="pane on" data-pane="docker">
+          <p>Relay und App mit einem Befehl:</p>
+          <pre><code>docker run -d --name nullraum -p 8080:8080 --read-only ghcr.io/maliceatthepalace/nullraum:latest</code></pre>
+          <p>Mit automatischem HTTPS über Caddy (empfohlen, für Sprachnachrichten nötig):</p>
+          <pre><code>git clone https://github.com/maliceatthepalace/nullraum &amp;&amp; cd nullraum
+NULLRAUM_DOMAIN=chat.example.org docker compose up -d</code></pre>
+        </div>
+        <div class="pane" data-pane="linux">
+          <pre><code>curl -L -o nullraum https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-linux-amd64
+chmod +x nullraum
+./nullraum serve -addr :8080        # Relay + App
+./nullraum serve -self-signed       # HTTPS im LAN</code></pre>
+          <p>Auf ARM (z. B. Raspberry Pi) <code>nullraum-linux-arm64</code> verwenden.</p>
+        </div>
+        <div class="pane" data-pane="mac">
+          <pre><code>curl -L -o nullraum https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-darwin-arm64
+chmod +x nullraum &amp;&amp; xattr -d com.apple.quarantine nullraum
+./nullraum client -relay https://chat.example.org</code></pre>
+          <p>Für Intel-Macs <code>nullraum-darwin-amd64</code> verwenden. <code>client</code> liefert die App lokal aus und verbindet sich nur mit dem Relay.</p>
+        </div>
+        <div class="pane" data-pane="win">
+          <pre><code>Invoke-WebRequest -OutFile nullraum.exe https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-windows-amd64.exe
+.\nullraum.exe client -relay https://chat.example.org</code></pre>
+          <p>Ein Doppelklick auf <code>nullraum.exe</code> startet ein lokales Relay und öffnet den Browser.</p>
+        </div>
+        <div class="pane" data-pane="src">
+          <pre><code>git clone https://github.com/maliceatthepalace/nullraum &amp;&amp; cd nullraum
+make            # baut WASM-Kryptokern + Binary (Go ≥ 1.26)
+./bin/nullraum serve</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="section">
+      <div class="section-head">
+        <span class="kicker">FAQ</span>
+        <h2>Häufige Fragen</h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>Was passiert, wenn jemand Fremdes meinen Code findet?</summary>
+          <p>Die Person kann anklopfen, mehr nicht. Du siehst die Anfrage und lehnst sie ab. Ist der Raum zusätzlich geschützt, scheitert sie schon vorher, und nach drei Fehlversuchen wird sie ignoriert. Erstelle im Zweifel einfach einen neuen Raum.</p>
+        </details>
+        <details>
+          <summary>Muss der Initiator online sein?</summary>
+          <p>Zum Aufnehmen neuer Mitglieder ja, denn nur sein Gerät kann den Raumschlüssel an Neue verteilen. Zum Chatten nicht. Nachrichten an Offline-Mitglieder hält das Relay verschlüsselt bis zu 72 Stunden im Arbeitsspeicher, und andere Mitglieder liefern fehlende Nachrichten Peer-to-Peer nach.</p>
+        </details>
+        <details>
+          <summary>Wo werden meine Nachrichten gespeichert?</summary>
+          <p>Verschlüsselt im Browser jedes Mitglieds (IndexedDB). Ohne Code, und gegebenenfalls ohne Passwort oder Antworten, sind sie nicht lesbar. Auf dem Server liegt nichts dauerhaft.</p>
+        </details>
+        <details>
+          <summary>Ich habe meinen Code verloren. Kann man ihn wiederherstellen?</summary>
+          <p>Nein, und das ist Absicht. Der Code wird nirgends gespeichert. Bitte ein anderes Mitglied, ihn dir auf demselben Weg noch einmal zu geben. Dein Gerät öffnet den Raum dann wieder.</p>
+        </details>
+        <details>
+          <summary>Warum „post-quantum“?</summary>
+          <p>Künftige Quantencomputer könnten heutige Public-Key-Verfahren wie RSA oder klassisches Diffie-Hellman brechen. Wer heute verschlüsselten Verkehr mitschneidet, könnte ihn später entschlüsseln. Nullraum nutzt dafür die 2024 standardisierten Verfahren ML-KEM und ML-DSA, kombiniert mit X25519 als klassischer Absicherung.</p>
+        </details>
+        <details>
+          <summary>Ist Nullraum ein Ersatz für Signal?</summary>
+          <p>Nullraum hat einen anderen Zweck: kurzlebige oder geschlossene Räume ohne Konto und ohne Telefonnummer, die du selbst hostest. Signal ist deutlich länger erprobt und bietet Forward Secrecy pro Nachricht. Wähle, was zu deinem Bedrohungsmodell passt.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="cta-final">
+      <h2>Mach einen Raum auf.<br><span class="grad">Und lass nur rein, wen du willst.</span></h2>
+      <div class="hero-cta">
+        <a class="btn primary js-app" href="app/">App öffnen</a>
+        <a class="btn" href="https://github.com/maliceatthepalace/nullraum" rel="noopener">Quellcode ansehen</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span><span class="brand-mark"></span> Nullraum · Open Source (MIT)</span>
+    <span>Keine Cookies. Kein Tracking. Keine externen Ressourcen.</span>
+  </footer>
+</body>
+</html>

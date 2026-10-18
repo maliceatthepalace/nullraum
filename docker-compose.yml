@@ -1,0 +1,27 @@
+# Nullraum relay with automatic HTTPS via Caddy.
+#   NULLRAUM_DOMAIN=chat.example.org docker compose up -d
+# DNS for the domain must point at this host; ports 80 and 443 must be open.
+services:
+  nullraum:
+    image: ghcr.io/maliceatthepalace/nullraum:latest
+    build: .
+    command: ["serve", "-addr", ":8080", "-trust-proxy"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+    expose: ["8080"]
+
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      NULLRAUM_DOMAIN: ${NULLRAUM_DOMAIN:?set NULLRAUM_DOMAIN, e.g. chat.example.org}
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    restart: unless-stopped
+    depends_on: [nullraum]
+
+volumes:
+  caddy_data:

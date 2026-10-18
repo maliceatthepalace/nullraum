@@ -1,0 +1,5 @@
+bin
+dist
+.git
+web/app/nullraum.wasm
+web/app/wasm_exec.js
