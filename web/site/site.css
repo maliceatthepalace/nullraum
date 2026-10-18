@@ -204,9 +204,15 @@ pre code { font-size: 13.5px; line-height: 1.7; color: #d7f7a0; white-space: pre
 .guide pre.plain .copy { display: none; }
 .guide pre .copy { top: auto; bottom: 10px; }
 .more { margin-top: 14px; max-width: none; }
-.more details pre { margin-bottom: 14px; }
+.more details pre { margin-bottom: 14px; padding-right: 20px; padding-bottom: 46px; }
+.more details pre .copy { top: auto; bottom: 10px; }
 .more details pre code { white-space: pre-wrap; word-break: break-all; }
 .more details a { color: var(--accent); }
+.dl { display: flex; flex-wrap: wrap; gap: 8px; }
+.more details .dl a { padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(200, 255, 60, .3); background: rgba(200, 255, 60, .06); text-decoration: none; font-weight: 600; font-size: 14px; }
+.more details .dl a:hover { background: rgba(200, 255, 60, .14); }
+.more details p { margin-bottom: 12px; }
+.more details b { color: var(--text); }
 .note { margin: 18px 0 0; color: var(--muted); }
 .note b { color: var(--text); }
 details { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 0 22px; transition: border-color .2s; }

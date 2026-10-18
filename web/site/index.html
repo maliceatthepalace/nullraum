@@ -267,9 +267,26 @@
         </details>
         <details>
           <summary>Nur zu Hause im WLAN nutzen</summary>
-          <p>Programm herunterladen (siehe unten) und starten:</p>
-          <pre><code>./nullraum serve -self-signed -addr :8443</code></pre>
-          <p>Dann im Heimnetz <code>https://&lt;IP-des-Rechners&gt;:8443/app/</code> öffnen und die Zertifikatswarnung einmal bestätigen. Für zu Hause ist das in Ordnung, fürs Internet nicht.</p>
+          <p><b>1. Programm herunterladen</b> (für den Rechner, auf dem der Server laufen soll):</p>
+          <p class="dl">
+            <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-windows-amd64.exe">Windows</a>
+            <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-darwin-arm64">macOS (Apple-Chip M1–M4)</a>
+            <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-darwin-amd64">macOS (Intel)</a>
+            <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-linux-amd64">Linux</a>
+            <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-linux-arm64">Raspberry Pi / Linux ARM</a>
+          </p>
+          <p><b>2. Im Terminal starten</b> (im Ordner, in dem die Datei liegt):</p>
+          <p>Windows (PowerShell):</p>
+          <pre><code>.\nullraum-windows-amd64.exe serve -self-signed -addr :8443</code></pre>
+          <p>macOS (bei Intel-Macs <code>arm64</code> durch <code>amd64</code> ersetzen):</p>
+          <pre><code>chmod +x nullraum-darwin-arm64
+xattr -d com.apple.quarantine nullraum-darwin-arm64
+./nullraum-darwin-arm64 serve -self-signed -addr :8443</code></pre>
+          <p>Linux (beim Raspberry Pi <code>amd64</code> durch <code>arm64</code> ersetzen):</p>
+          <pre><code>chmod +x nullraum-linux-amd64
+./nullraum-linux-amd64 serve -self-signed -addr :8443</code></pre>
+          <p>Fragt die Firewall nach, ob der Zugriff erlaubt ist: für das private Netzwerk erlauben.</p>
+          <p><b>3. Öffnen:</b> Auf allen Geräten im Heimnetz <code>https://&lt;IP-des-Rechners&gt;:8443/app/</code> aufrufen und die Zertifikatswarnung einmal bestätigen. Die IP findest du unter Windows mit <code>ipconfig</code>, unter macOS/Linux mit <code>ipconfig getifaddr en0</code> bzw. <code>hostname -I</code>. Für zu Hause ist das in Ordnung, fürs Internet nicht.</p>
         </details>
         <details>
           <summary>Für Vorsichtige: App vom eigenen Rechner laden</summary>
