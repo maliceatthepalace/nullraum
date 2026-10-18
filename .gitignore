@@ -3,3 +3,6 @@
 # built by `make wasm`
 /web/app/nullraum.wasm
 /web/app/wasm_exec.js
+/test/e2e/node_modules/
+/test/e2e/shots/
+/test/e2e/package-lock.json

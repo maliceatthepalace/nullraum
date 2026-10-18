@@ -4,6 +4,7 @@ import zlib from 'node:zlib';
 const BASE = process.env.BASE || 'http://127.0.0.1:8080';
 const shots = process.env.SHOTS || '/work/shots';
 const log = (...a) => console.log('•', ...a);
+const assert = (ok, msg) => { if (!ok) throw new Error('ASSERTION FAILED: ' + msg); };
 const browser = await chromium.launch();
 const mk = async (name) => {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 } });
@@ -66,7 +67,8 @@ const fpB = await knock(B, 'Bob', 'supergeheim123', true);
 await B.screenshot({ path: `${shots}/4-waiting.png` });
 await A.locator('.request').waitFor({ timeout: 15000 });
 const fpA = (await A.locator('.request code').textContent()).trim();
-log('fingerprints', fpB, fpA, fpA === fpB ? 'MATCH ✓' : 'MISMATCH ✗');
+assert(fpA === fpB && /^(\d{4} ){5}\d{4}$/.test(fpA), `fingerprints differ: ${fpA} / ${fpB}`);
+log('fingerprints match ✓', fpA);
 await A.screenshot({ path: `${shots}/5-request.png` });
 await A.getByRole('button', { name: 'Aufnehmen' }).click();
 await B.locator('.composer').waitFor({ timeout: 20000 });
@@ -99,7 +101,8 @@ await A.getByRole('button', { name: 'Aufnehmen' }).click();
 await Cc.locator('.composer').waitFor({ timeout: 20000 });
 await Cc.waitForTimeout(3000);
 const carolSees = await Cc.locator('.msg').count();
-log('Carol sees old messages:', carolSees, carolSees === 0 ? '✓ (history locked)' : '✗');
+assert(carolSees === 0, `new member sees ${carolSees} old messages`);
+log('history locked for new member ✓');
 await B.locator('textarea').fill('Willkommen Carol');
 await B.keyboard.press('Enter');
 await Cc.getByText('Willkommen Carol').waitFor({ timeout: 15000 });
@@ -155,7 +158,8 @@ const M = await (await browser.newContext({ viewport: { width: 390, height: 844 
 await M.goto(BASE + '/'); await M.waitForTimeout(600);
 await M.screenshot({ path: `${shots}/10-site-mobile.png` });
 const overflow = await M.evaluate(() => document.documentElement.scrollWidth > innerWidth);
-log('mobile horizontal overflow:', overflow);
+assert(!overflow, 'website overflows horizontally on mobile');
+log('no horizontal overflow on mobile ✓');
 
 await browser.close();
 log('ALL DONE');
