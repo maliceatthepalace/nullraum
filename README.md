@@ -34,33 +34,47 @@ Das Relay ist **blind**. Es kennt nur eine aus dem Code abgeleitete Raum-ID (Has
 
 Der Verlauf liegt **redundant und verschlüsselt** bei allen Mitgliedern (IndexedDB). Fehlende Nachrichten und Medien liefern andere Mitglieder Peer-to-Peer nach. Lesbar ist der Verlauf nur mit dem Code (und ggf. Passwort/Antworten).
 
-## Installation
+## Eigenen Server starten (ein Befehl)
 
-### Docker
+Nur **eine Person** braucht einen Server. Alle anderen öffnen einfach den Link im Browser.
+
+1. **Server besorgen:** ein Linux-Server mit öffentlicher IP (z. B. VPS für 3–5 €/Monat). Port 80 und 443 müssen offen sein. **Eine Domain ist nicht nötig.**
+2. **Per SSH ausführen:**
+   ```sh
+   curl -fsSL https://raw.githubusercontent.com/maliceatthepalace/nullraum/main/deploy/install.sh | sudo sh
+   ```
+3. **Link teilen**, den der Befehl am Ende ausgibt, z. B. `https://203-0-113-7.sslip.io/app/`
+
+Ohne eigene Domain nutzt das Skript [sslip.io](https://sslip.io): `203-0-113-7.sslip.io` zeigt automatisch auf die IP `203.0.113.7`. So gibt es ein echtes HTTPS-Zertifikat ohne Browser-Warnung. Mit eigener Domain:
 
 ```sh
-docker run -d --name nullraum -p 8080:8080 --read-only ghcr.io/maliceatthepalace/nullraum:latest
+curl -fsSL https://raw.githubusercontent.com/maliceatthepalace/nullraum/main/deploy/install.sh | sudo NULLRAUM_DOMAIN=chat.example.org sh
 ```
 
-Mit automatischem HTTPS (Caddy). HTTPS ist für Sprachnachrichten nötig und für den Betrieb im Internet dringend empfohlen:
+Alle in einem Raum müssen **denselben** Server benutzen.
+
+### Nur zu Hause (LAN)
+
+```sh
+./nullraum serve -self-signed -addr :8443    # dann https://<IP>:8443/app/ öffnen, Warnung einmal bestätigen
+```
+
+### Für Vorsichtige: App vom eigenen Rechner
+
+Normalerweise lädt der Browser die App vom Server, und ein böswilliger Betreiber könnte sie manipulieren. Mit dem `client`-Modus kommt die App von deinem Rechner, und über den Server läuft nur noch der verschlüsselte Datenverkehr:
+
+```sh
+nullraum client -relay https://203-0-113-7.sslip.io
+```
+
+Programme: [Releases](https://github.com/maliceatthepalace/nullraum/releases) (Linux, macOS, Windows). Doppelklick auf `nullraum` startet einen lokalen Testserver und öffnet den Browser.
+
+### Docker von Hand
 
 ```sh
 git clone https://github.com/maliceatthepalace/nullraum && cd nullraum
-NULLRAUM_DOMAIN=chat.example.org docker compose up -d
+NULLRAUM_DOMAIN=203-0-113-7.sslip.io docker compose up -d
 ```
-
-### Linux / macOS / Windows
-
-Binaries gibt es unter [Releases](https://github.com/maliceatthepalace/nullraum/releases):
-
-```sh
-./nullraum serve -addr :8080          # Relay + Web-App
-./nullraum serve -self-signed         # HTTPS im LAN mit selbstsigniertem Zertifikat
-./nullraum client -relay https://chat.example.org   # App lokal ausliefern, nur Relay entfernt
-./nullraum                            # Doppelklick: lokales Relay + Browser öffnen
-```
-
-**`client`-Modus:** Die App (und damit der Code, der deine Schlüssel verarbeitet) kommt von deinem eigenen Rechner, nicht vom Relay-Betreiber. Das ist der sicherste Weg, einen fremden Server zu nutzen.
 
 ### Aus dem Quellcode
 

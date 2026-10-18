@@ -1,17 +1,9 @@
-// Website interactions: install tabs, copy buttons, ciphertext ticker, reveal on scroll.
+// Website interactions: copy buttons, ciphertext ticker, reveal on scroll.
 (() => {
   // On static hosting (e.g. GitHub Pages) there is no relay, so point CTAs to the install guide.
   if (/github\.io$/.test(location.hostname)) {
     document.querySelectorAll('.js-app').forEach((a) => { a.href = '#install'; a.textContent = 'Installieren'; });
   }
-
-  const tabs = document.querySelectorAll('.tabs button');
-  tabs.forEach((b) => b.addEventListener('click', () => {
-    tabs.forEach((x) => x.classList.toggle('on', x === b));
-    document.querySelectorAll('.pane').forEach((p) => p.classList.toggle('on', p.dataset.pane === b.dataset.tab));
-  }));
-  if (/Mac/.test(navigator.platform)) document.querySelector('[data-tab="mac"]')?.click();
-  else if (/Win/.test(navigator.platform)) document.querySelector('[data-tab="win"]')?.click();
 
   document.querySelectorAll('pre').forEach((pre) => {
     const btn = document.createElement('button');

@@ -229,50 +229,64 @@
     <section id="install" class="section">
       <div class="section-head">
         <span class="kicker">Installation</span>
-        <h2>In einer Minute startklar.</h2>
-        <p class="sub">Einer betreibt das Relay, zum Beispiel auf einem kleinen Server, NAS oder Raspberry Pi. Alle anderen öffnen nur die Adresse im Browser.</p>
+        <h2>Eigenen Server starten.<br><span class="muted">Ein Befehl, fertig.</span></h2>
+        <p class="sub">Nur <b>eine Person</b> muss das machen. Alle anderen installieren nichts und öffnen einfach den Link.</p>
       </div>
 
-      <div class="tabs" role="tablist">
-        <button class="on" data-tab="docker" role="tab">Docker</button>
-        <button data-tab="linux" role="tab">Linux</button>
-        <button data-tab="mac" role="tab">macOS</button>
-        <button data-tab="win" role="tab">Windows</button>
-        <button data-tab="src" role="tab">Quellcode</button>
+      <ol class="guide">
+        <li>
+          <span class="num">01</span>
+          <h3>Server besorgen</h3>
+          <p>Irgendein Linux-Server mit öffentlicher IP reicht, zum Beispiel ein kleiner VPS für 3–5 € im Monat. <b>Eine eigene Domain brauchst du nicht.</b></p>
+          <p class="hint">Beim Hoster müssen Port <code>80</code> und <code>443</code> offen sein.</p>
+        </li>
+        <li>
+          <span class="num">02</span>
+          <h3>Diesen Befehl ausführen</h3>
+          <p>Per SSH auf dem Server einfügen. Der Befehl installiert Docker, startet Nullraum und besorgt automatisch ein echtes HTTPS-Zertifikat.</p>
+          <pre><code>curl -fsSL https://raw.githubusercontent.com/maliceatthepalace/nullraum/main/deploy/install.sh | sudo sh</code></pre>
+        </li>
+        <li>
+          <span class="num">03</span>
+          <h3>Link teilen</h3>
+          <p>Am Ende zeigt der Befehl deinen Link, etwa so:</p>
+          <pre class="plain"><code>https://203-0-113-7.sslip.io/app/</code></pre>
+          <p>Diesen Link schickst du allen. Raum erstellen, Code weitergeben, fertig.</p>
+        </li>
+      </ol>
+
+      <div class="faq more">
+        <details>
+          <summary>Ich habe eine eigene Domain</summary>
+          <p>Zeig mit einem DNS-Eintrag (A-Record) auf die IP deines Servers und gib die Domain beim Befehl mit an:</p>
+          <pre><code>curl -fsSL https://raw.githubusercontent.com/maliceatthepalace/nullraum/main/deploy/install.sh | sudo NULLRAUM_DOMAIN=chat.example.org sh</code></pre>
+        </details>
+        <details>
+          <summary>Was ist dieses „sslip.io“?</summary>
+          <p>Ohne Domain gibt es kein gültiges HTTPS-Zertifikat. Ein „selbstsigniertes“ Zertifikat würde in jedem Browser eine Warnung anzeigen, und gegen Angreifer im Netz schützt es dann nicht mehr richtig. sslip.io ist ein kostenloser Dienst: Der Name <code>203-0-113-7.sslip.io</code> zeigt automatisch auf die IP <code>203.0.113.7</code>. So bekommt dein Server ein echtes Zertifikat, ganz ohne Domain.</p>
+        </details>
+        <details>
+          <summary>Nur zu Hause im WLAN nutzen</summary>
+          <p>Programm herunterladen (siehe unten) und starten:</p>
+          <pre><code>./nullraum serve -self-signed -addr :8443</code></pre>
+          <p>Dann im Heimnetz <code>https://&lt;IP-des-Rechners&gt;:8443/app/</code> öffnen und die Zertifikatswarnung einmal bestätigen. Für zu Hause ist das in Ordnung, fürs Internet nicht.</p>
+        </details>
+        <details>
+          <summary>Für Vorsichtige: App vom eigenen Rechner laden</summary>
+          <p>Normalerweise lädt dein Browser die App vom Server. Ein böswilliger Betreiber könnte dir theoretisch eine manipulierte App unterschieben. Wenn du dem Server nicht vertraust, startest du die App auf deinem eigenen Rechner. Über den Server läuft dann nur noch der verschlüsselte Datenverkehr.</p>
+          <p>Programm für dein System herunterladen: <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-windows-amd64.exe">Windows</a> · <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-darwin-arm64">macOS (Apple-Chip)</a> · <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-darwin-amd64">macOS (Intel)</a> · <a href="https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-linux-amd64">Linux</a>. Dann im Terminal:</p>
+          <pre><code>nullraum client -relay https://203-0-113-7.sslip.io</code></pre>
+          <p>Der Browser öffnet sich automatisch. Wer den Server selbst betreibt oder dem Betreiber vertraut, braucht das nicht.</p>
+        </details>
+        <details>
+          <summary>Ohne Skript / mit Docker von Hand</summary>
+          <pre><code>git clone https://github.com/maliceatthepalace/nullraum &amp;&amp; cd nullraum
+NULLRAUM_DOMAIN=203-0-113-7.sslip.io docker compose up -d</code></pre>
+          <p>Aus dem Quellcode: <code>make</code> (Go ≥ 1.26), dann <code>./bin/nullraum serve</code>.</p>
+        </details>
       </div>
 
-      <div class="panes">
-        <div class="pane on" data-pane="docker">
-          <p>Relay und App mit einem Befehl:</p>
-          <pre><code>docker run -d --name nullraum -p 8080:8080 --read-only ghcr.io/maliceatthepalace/nullraum:latest</code></pre>
-          <p>Mit automatischem HTTPS über Caddy (empfohlen, für Sprachnachrichten nötig):</p>
-          <pre><code>git clone https://github.com/maliceatthepalace/nullraum &amp;&amp; cd nullraum
-NULLRAUM_DOMAIN=chat.example.org docker compose up -d</code></pre>
-        </div>
-        <div class="pane" data-pane="linux">
-          <pre><code>curl -L -o nullraum https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-linux-amd64
-chmod +x nullraum
-./nullraum serve -addr :8080        # Relay + App
-./nullraum serve -self-signed       # HTTPS im LAN</code></pre>
-          <p>Auf ARM (z. B. Raspberry Pi) <code>nullraum-linux-arm64</code> verwenden.</p>
-        </div>
-        <div class="pane" data-pane="mac">
-          <pre><code>curl -L -o nullraum https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-darwin-arm64
-chmod +x nullraum &amp;&amp; xattr -d com.apple.quarantine nullraum
-./nullraum client -relay https://chat.example.org</code></pre>
-          <p>Für Intel-Macs <code>nullraum-darwin-amd64</code> verwenden. <code>client</code> liefert die App lokal aus und verbindet sich nur mit dem Relay.</p>
-        </div>
-        <div class="pane" data-pane="win">
-          <pre><code>Invoke-WebRequest -OutFile nullraum.exe https://github.com/maliceatthepalace/nullraum/releases/latest/download/nullraum-windows-amd64.exe
-.\nullraum.exe client -relay https://chat.example.org</code></pre>
-          <p>Ein Doppelklick auf <code>nullraum.exe</code> startet ein lokales Relay und öffnet den Browser.</p>
-        </div>
-        <div class="pane" data-pane="src">
-          <pre><code>git clone https://github.com/maliceatthepalace/nullraum &amp;&amp; cd nullraum
-make            # baut WASM-Kryptokern + Binary (Go ≥ 1.26)
-./bin/nullraum serve</code></pre>
-        </div>
-      </div>
+      <p class="note">Wichtig: Alle in einem Raum müssen <b>denselben</b> Server benutzen. Ein Raum auf Server A ist auf Server B nicht sichtbar.</p>
     </section>
 
     <!-- FAQ -->

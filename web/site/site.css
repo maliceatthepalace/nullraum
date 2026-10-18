@@ -193,6 +193,22 @@ pre code { font-size: 13.5px; line-height: 1.7; color: #d7f7a0; white-space: pre
 .copy:hover { color: var(--text); }
 
 .faq { display: grid; gap: 10px; max-width: 860px; }
+.guide { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.guide li { min-width: 0; padding: 26px 22px; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); display: grid; gap: 12px; align-content: start; }
+.guide p { margin: 0; color: var(--muted); font-size: 15px; }
+.guide b { color: var(--text); }
+.guide .hint { font-size: 13px; }
+.guide pre { padding-right: 20px; padding-bottom: 46px; }
+.guide pre code { white-space: pre-wrap; word-break: break-all; }
+.guide pre.plain { padding-bottom: 18px; }
+.guide pre.plain .copy { display: none; }
+.guide pre .copy { top: auto; bottom: 10px; }
+.more { margin-top: 14px; max-width: none; }
+.more details pre { margin-bottom: 14px; }
+.more details pre code { white-space: pre-wrap; word-break: break-all; }
+.more details a { color: var(--accent); }
+.note { margin: 18px 0 0; color: var(--muted); }
+.note b { color: var(--text); }
 details { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 0 22px; transition: border-color .2s; }
 details[open] { border-color: var(--line2); }
 summary { cursor: pointer; list-style: none; padding: 20px 0; font-weight: 650; display: flex; justify-content: space-between; gap: 16px; }
@@ -215,6 +231,7 @@ details p { margin: 0 0 20px; color: var(--muted); }
   .hero { grid-template-columns: 1fr; }
   .hero-visual { min-height: 580px; }
   .steps { grid-template-columns: 1fr 1fr; }
+  .guide { grid-template-columns: 1fr; }
   .bento { grid-template-columns: 1fr 1fr; }
   .strip { grid-template-columns: 1fr 1fr; }
   .strip div:nth-child(3) { border-left: 0; }
