@@ -233,10 +233,7 @@ func (h *Hub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer h.unregister(p)
 
-	go h.writeLoop(ctx, c, p)
-	for _, b := range backlog {
-		h.enqueue(p, b)
-	}
+	go h.writeLoop(ctx, c, p, backlog)
 
 	tokens := float64(h.cfg.FrameBurst)
 	last := time.Now()
@@ -262,7 +259,19 @@ func (h *Hub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Hub) writeLoop(ctx context.Context, c *websocket.Conn, p *peer) {
+// writeLoop first writes the hello and the stored backlog directly, so a
+// mailbox larger than the send queue cannot get the joiner disconnected, then
+// forwards live frames.
+func (h *Hub) writeLoop(ctx context.Context, c *websocket.Conn, p *peer, backlog [][]byte) {
+	for _, b := range backlog {
+		wctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		err := c.Write(wctx, websocket.MessageText, b)
+		cancel()
+		if err != nil {
+			p.kill()
+			return
+		}
+	}
 	ping := time.NewTicker(25 * time.Second)
 	defer ping.Stop()
 	for {

@@ -155,3 +155,19 @@ func TestRoomFull(t *testing.T) {
 		t.Fatalf("expected room full, got %v", err)
 	}
 }
+
+func TestMailboxLargerThanSendQueue(t *testing.T) {
+	const n = 2000 // well above the 512-frame send queue
+	cfg := DefaultConfig()
+	cfg.FrameBurst = n
+	srv := httptest.NewServer(NewHub(cfg))
+	defer srv.Close()
+	a := dial(t, srv.URL, roomA)
+	for i := 0; i < n; i++ {
+		a.send(map[string]any{"t": "send", "store": true, "d": map[string]string{"c": "x"}})
+	}
+	time.Sleep(200 * time.Millisecond)
+	if got := dial2(t, srv.URL, roomA); len(got) != n {
+		t.Fatalf("mailbox replay: got %d of %d frames", len(got), n)
+	}
+}
