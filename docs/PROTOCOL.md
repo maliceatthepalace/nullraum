@@ -82,7 +82,8 @@ Medien: eigener zufälliger 256-Bit-Schlüssel, `ct = XChaCha20-Poly1305(fileKey
 ## Redundanz
 
 * Jedes Mitglied speichert alle Envelopes (mit Signatur) verschlüsselt mit `vaultKey` in IndexedDB, Medien als Chiffretext.
-* Beim Verbinden: `sync_req{member, epoch, have[≤300 ids]}`. Andere Mitglieder antworten gezielt mit fehlenden Envelopes (nur `ts ≥ since` des Anfragenden), dem aktuellen Roster und, falls die Epoche veraltet ist, dem letzten Rekey.
+* Beim Verbinden: `sync_req{body: {member, peer, epoch, have[≤300 ids]}, sig: ML-DSA-65(body)}` mit Kontext `nullraum/v1/sync|roomId`. `peer` ist die eigene Relay-Peer-ID aus `hello`. Andere Mitglieder prüfen die Signatur mit dem Schlüssel von `member` aus dem Roster und antworten nur, wenn `peer` dem Absender des Frames entspricht. Unsignierte Anfragen (ältere Clients) werden ignoriert.
+* Die Antwort geht gezielt an den Anfragenden: fehlende Envelopes (nur `ts ≥ since` des Anfragenden), das aktuelle Roster und, falls die Epoche veraltet ist, der letzte Rekey.
 * Fehlende Medien: `media_req{mid}` → jedes Mitglied mit der Datei sendet die Chunks gezielt.
 * Signaturen machen weitergereichte Nachrichten fälschungssicher, egal wer sie liefert.
 
