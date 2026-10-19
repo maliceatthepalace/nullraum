@@ -2,8 +2,8 @@
 //
 // Wire packets inside the relay's opaque "d" field: {k, e?, c}
 //   k = 'j'  AEAD(joinKey)                     – hello, challenge, deny, rekey
-//   k = 'q'  AEAD(joinKey ⊕ secret)            – join request
-//   k = 'w'  HPKE(ML-KEM-768+X25519) ∘ AEAD(joinKey ⊕ secret) – welcome
+//   k = 'q'  AEAD(HKDF(joinKey ‖ secret))      – join request
+//   k = 'w'  HPKE(ML-KEM-768+X25519) ∘ AEAD(HKDF(joinKey ‖ secret)) – welcome
 //   k = 'r'  AEAD(roomKey[e])                  – everything inside the room
 
 import { C, b64, unb64, hex, concat, json, parse, enc, sleep } from './crypto.js';
