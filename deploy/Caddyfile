@@ -1,5 +1,13 @@
+{
+	# No IP addresses in logs. Caddy writes no access logs unless configured
+	# to, but its error logs include the client address and headers (e.g. when
+	# the relay restarts). Drop those loggers; ACME/TLS diagnostics stay.
+	log default {
+		exclude http.log.error http.handlers.reverse_proxy http.stdlib
+	}
+}
+
 {$NULLRAUM_DOMAIN} {
 	encode zstd gzip
-	# No access logs: Caddy does not log requests unless configured to.
 	reverse_proxy nullraum:8080
 }
