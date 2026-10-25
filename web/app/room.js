@@ -636,16 +636,25 @@ export class Room extends EventTarget {
 
   async requestSync() {
     const have = this.sortedMessages().slice(-SYNC_LIMIT).map((m) => m.id);
-    await this.sendRoom({ type: 'sync_req', member: this.me.id, epoch: this.epoch, have });
+    // Signed and bound to our relay peer id, so nobody can ask for another
+    // member's history (e.g. the admin's, to bypass the history lock).
+    const body = json({ member: this.me.id, peer: this.myPeer, epoch: this.epoch, have });
+    const sig = await C.sign(this.me.sigPriv, body, ctx('sync', this.roomId));
+    await this.sendRoom({ type: 'sync_req', body: b64(body), sig: b64(sig) });
   }
 
   async onSyncRequest(p, from) {
-    const m = this.roster?.members[p.member];
-    if (!from || !m || m.removed || p.member === this.me.id) return;
+    if (!from || typeof p.body !== 'string' || typeof p.sig !== 'string') return;
+    const body = unb64(p.body);
+    const req = parse(body);
+    const members = this.roster?.members;
+    const m = members && Object.hasOwn(members, req.member) ? members[req.member] : null;
+    if (!m || m.removed || req.member === this.me.id || req.peer !== from) return;
+    if (!(await C.verify(unb64(m.sig), body, unb64(p.sig), ctx('sync', this.roomId)))) return;
     await sleep(Math.random() * 1200);
-    if (p.epoch < this.epoch && this.lastRekey) this.send(await this.seal('j', this.lastRekey), { to: from });
+    if (req.epoch < this.epoch && this.lastRekey) this.send(await this.seal('j', this.lastRekey), { to: from });
     await this.broadcastRoster(from);
-    const have = new Set(Array.isArray(p.have) ? p.have : []);
+    const have = new Set(Array.isArray(req.have) ? req.have : []);
     const items = [...this.messages.values()]
       .filter((x) => !have.has(x.env.id) && x.env.ts >= (m.since || 0))
       .sort((a, b) => a.env.ts - b.env.ts)
