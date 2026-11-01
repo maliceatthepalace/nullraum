@@ -12,6 +12,7 @@ import { store } from './store.js';
 const CHUNK = 192 * 1024;
 export const MAX_MEDIA = 50 * 1024 * 1024;
 const SYNC_LIMIT = 300;
+const SAFE_MIME = /^(image\/(png|jpeg|gif|webp)|video\/[\w.+-]+|audio\/[\w.+-]+)$/;
 
 const ctx = (what, roomId) => `nullraum/v1/${what}|${roomId}`;
 
@@ -629,7 +630,10 @@ export class Room extends EventTarget {
     const ct = await store.getMedia(this.roomId, media.mid);
     if (!ct) return null;
     const pt = await C.open(unb64(media.key), ct, enc.encode('media|' + media.mid));
-    return new Blob([pt], { type: media.mime });
+    // The sender picks the MIME type. Anything that a browser could render as a
+    // document (text/html, image/svg+xml, …) becomes a plain download instead.
+    const type = SAFE_MIME.test(media.mime) ? media.mime : 'application/octet-stream';
+    return new Blob([pt], { type });
   }
 
   // ---------- redundancy: peer-to-peer history sync ----------

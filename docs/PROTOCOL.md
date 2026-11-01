@@ -77,7 +77,7 @@ env = {v, id(128 Bit), from, ts, kind: text|image|video|audio|file, text?, media
 packet = {type:"msg", env: b64(json(env)), sig: ML-DSA-65(env)}
 ```
 
-Medien: eigener zufälliger 256-Bit-Schlüssel, `ct = XChaCha20-Poly1305(fileKey, datei, AAD media|mid)`. In `env.media` stehen `mid`, `mime`, `size`, `key` und `hash = SHA-256(ct)`. Der Chiffretext geht in Chunks à 192 KiB als `chunk`-Pakete raus. Fotos werden vor dem Senden neu kodiert, damit EXIF/GPS entfernt wird.
+Medien: eigener zufälliger 256-Bit-Schlüssel, `ct = XChaCha20-Poly1305(fileKey, datei, AAD media|mid)`. In `env.media` stehen `mid`, `mime`, `size`, `key` und `hash = SHA-256(ct)`. Der Chiffretext geht in Chunks à 192 KiB als `chunk`-Pakete raus. Fotos werden vor dem Senden neu kodiert, damit EXIF/GPS entfernt wird. Empfänger übernehmen `mime` nur für `image/png|jpeg|gif|webp`, `video/*` und `audio/*`, alles andere wird als `application/octet-stream` behandelt (keine vom Absender gewählten HTML-/SVG-Dokumente im App-Ursprung).
 
 ## Redundanz
 
