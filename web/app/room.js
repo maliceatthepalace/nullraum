@@ -12,6 +12,7 @@ import { store } from './store.js';
 const CHUNK = 192 * 1024;
 export const MAX_MEDIA = 50 * 1024 * 1024;
 const SYNC_LIMIT = 300;
+const HOLD_LIMIT = 256; // room packets kept while waiting for a newer epoch key
 const SAFE_MIME = /^(image\/(png|jpeg|gif|webp)|video\/[\w.+-]+|audio\/[\w.+-]+)$/;
 
 const ctx = (what, roomId) => `nullraum/v1/${what}|${roomId}`;
@@ -62,6 +63,7 @@ export class Room extends EventTarget {
     this.challenges = new Map(); // peer -> anonce (admin)
     this.failures = new Map(); // peer -> count (admin)
     this.heldPackets = new Map(); // epoch -> packets waiting for a key
+    this.heldCount = 0;
     this.orphans = []; // envelopes from members not yet in the roster
     this.keys = {};
     this.epoch = 0;
@@ -250,8 +252,14 @@ export class Room extends EventTarget {
     if (d.k === 'r') {
       const key = this.keys[d.e];
       if (!key) {
+        // Only a future epoch's key can still arrive via rekey. Older epochs
+        // (e.g. backlog from before we joined) are dropped; peer sync covers
+        // anything missed. Bounded, since anyone in the relay room can send.
+        if (this.state !== 'member' || !Number.isSafeInteger(d.e) || d.e <= this.epoch) return;
+        if (this.heldCount >= HOLD_LIMIT) return;
         if (!this.heldPackets.has(d.e)) this.heldPackets.set(d.e, []);
         this.heldPackets.get(d.e).push([d, from]);
+        this.heldCount++;
         return;
       }
       let p;
@@ -475,6 +483,7 @@ export class Room extends EventTarget {
     this.emit('epoch');
     const held = this.heldPackets.get(body.epoch) || [];
     this.heldPackets.delete(body.epoch);
+    this.heldCount -= held.length;
     for (const [d, from] of held) await this.onPacket(d, from);
   }
 
